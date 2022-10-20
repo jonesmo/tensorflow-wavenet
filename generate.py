@@ -9,6 +9,8 @@ import os
 import librosa
 import numpy as np
 import tensorflow as tf
+tf.compat.v1.disable_eager_execution()
+import soundfile as sf
 
 from wavenet import WaveNetModel, mu_law_decode, mu_law_encode, audio_reader
 
@@ -112,7 +114,8 @@ def get_arguments():
 
 def write_wav(waveform, sample_rate, filename):
     y = np.array(waveform)
-    librosa.output.write_wav(filename, y, sample_rate)
+    # librosa.output.write_wav(filename, y, sample_rate)
+    sf.write(filename, y, sample_rate, 'PCM_24')
     print('Updated wav file at {}'.format(filename))
 
 
@@ -125,9 +128,9 @@ def create_seed(filename,
     audio = audio_reader.trim_silence(audio, silence_threshold)
 
     quantized = mu_law_encode(audio, quantization_channels)
-    cut_index = tf.cond(tf.size(quantized) < tf.constant(window_size),
-                        lambda: tf.size(quantized),
-                        lambda: tf.constant(window_size))
+    cut_index = tf.cond(pred=tf.size(input=quantized) < tf.constant(window_size),
+                        true_fn=lambda: tf.size(input=quantized),
+                        false_fn=lambda: tf.constant(window_size))
 
     return quantized[:cut_index]
 
@@ -139,7 +142,7 @@ def main():
     with open(args.wavenet_params, 'r') as config_file:
         wavenet_params = json.load(config_file)
 
-    sess = tf.Session()
+    sess = tf.compat.v1.Session()
 
     net = WaveNetModel(
         batch_size=1,
@@ -155,7 +158,7 @@ def main():
         global_condition_channels=args.gc_channels,
         global_condition_cardinality=args.gc_cardinality)
 
-    samples = tf.placeholder(tf.int32)
+    samples = tf.compat.v1.placeholder(tf.int32)
 
     if args.fast_generation:
         next_sample = net.predict_proba_incremental(samples, args.gc_id)
@@ -163,13 +166,13 @@ def main():
         next_sample = net.predict_proba(samples, args.gc_id)
 
     if args.fast_generation:
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         sess.run(net.init_ops)
 
     variables_to_restore = {
-        var.name[:-2]: var for var in tf.global_variables()
+        var.name[:-2]: var for var in tf.compat.v1.global_variables()
         if not ('state_buffer' in var.name or 'pointer' in var.name)}
-    saver = tf.train.Saver(variables_to_restore)
+    saver = tf.compat.v1.train.Saver(variables_to_restore)
 
     print('Restoring model from {}'.format(args.checkpoint))
     saver.restore(sess, args.checkpoint)
@@ -260,9 +263,9 @@ def main():
 
     # Save the result as an audio summary.
     datestring = str(datetime.now()).replace(' ', 'T')
-    writer = tf.summary.FileWriter(logdir)
-    tf.summary.audio('generated', decode, wavenet_params['sample_rate'])
-    summaries = tf.summary.merge_all()
+    writer = tf.compat.v1.summary.FileWriter(logdir)
+    tf.compat.v1.summary.audio('generated', decode, wavenet_params['sample_rate'])
+    summaries = tf.compat.v1.summary.merge_all()
     summary_out = sess.run(summaries,
                            feed_dict={samples: np.reshape(waveform, [-1, 1])})
     writer.add_summary(summary_out)

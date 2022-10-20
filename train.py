@@ -15,12 +15,13 @@ import sys
 import time
 
 import tensorflow as tf
+tf.compat.v1.disable_eager_execution()
 from tensorflow.python.client import timeline
 
 from wavenet import WaveNetModel, AudioReader, optimizer_factory
 
 BATCH_SIZE = 1
-DATA_DIRECTORY = './VCTK-Corpus'
+DATA_DIRECTORY = './data_corpus'
 LOGDIR_ROOT = './logdir'
 CHECKPOINT_EVERY = 50
 NUM_STEPS = int(1e5)
@@ -209,7 +210,7 @@ def main():
     coord = tf.train.Coordinator()
 
     # Load raw waveform from VCTK corpus.
-    with tf.name_scope('create_inputs'):
+    with tf.compat.v1.name_scope('create_inputs'):
         # Allow silence trimming to be skipped by specifying a threshold near
         # zero.
         silence_threshold = args.silence_threshold if args.silence_threshold > \
@@ -256,22 +257,22 @@ def main():
     optimizer = optimizer_factory[args.optimizer](
                     learning_rate=args.learning_rate,
                     momentum=args.momentum)
-    trainable = tf.trainable_variables()
+    trainable = tf.compat.v1.trainable_variables()
     optim = optimizer.minimize(loss, var_list=trainable)
 
     # Set up logging for TensorBoard.
-    writer = tf.summary.FileWriter(logdir)
-    writer.add_graph(tf.get_default_graph())
-    run_metadata = tf.RunMetadata()
-    summaries = tf.summary.merge_all()
+    writer = tf.compat.v1.summary.FileWriter(logdir)
+    writer.add_graph(tf.compat.v1.get_default_graph())
+    run_metadata = tf.compat.v1.RunMetadata()
+    summaries = tf.compat.v1.summary.merge_all()
 
     # Set up session
-    sess = tf.Session(config=tf.ConfigProto(log_device_placement=False))
-    init = tf.global_variables_initializer()
+    sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=False))
+    init = tf.compat.v1.global_variables_initializer()
     sess.run(init)
 
     # Saver for storing checkpoints of the model.
-    saver = tf.train.Saver(var_list=tf.trainable_variables(), max_to_keep=args.max_checkpoints)
+    saver = tf.compat.v1.train.Saver(var_list=tf.compat.v1.trainable_variables(), max_to_keep=args.max_checkpoints)
 
     try:
         saved_global_step = load(saver, sess, restore_from)
@@ -286,7 +287,7 @@ def main():
               "the previous model.")
         raise
 
-    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+    threads = tf.compat.v1.train.start_queue_runners(sess=sess, coord=coord)
     reader.start_threads(sess)
 
     step = None
@@ -297,8 +298,8 @@ def main():
             if args.store_metadata and step % 50 == 0:
                 # Slow run that stores extra information for debugging.
                 print('Storing metadata')
-                run_options = tf.RunOptions(
-                    trace_level=tf.RunOptions.FULL_TRACE)
+                run_options = tf.compat.v1.RunOptions(
+                    trace_level=tf.compat.v1.RunOptions.FULL_TRACE)
                 summary, loss_value, _ = sess.run(
                     [summaries, loss, optim],
                     options=run_options,

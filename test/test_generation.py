@@ -19,13 +19,13 @@ class TestGeneration(tf.test.TestCase):
     def testGenerateSimple(self):
         '''Generate a few samples using the naive method and
         perform sanity checks on the output.'''
-        waveform = tf.placeholder(tf.int32)
+        waveform = tf.compat.v1.placeholder(tf.int32)
         np.random.seed(0)
         data = np.random.randint(128, size=1000)
         proba = self.net.predict_proba(waveform)
 
         with self.test_session() as sess:
-            sess.run(tf.global_variables_initializer())
+            sess.run(tf.compat.v1.global_variables_initializer())
             proba = sess.run(proba, feed_dict={waveform: data})
 
         self.assertAllEqual(proba.shape, [128])
@@ -34,13 +34,13 @@ class TestGeneration(tf.test.TestCase):
     def testGenerateFast(self):
         '''Generate a few samples using the fast method and
         perform sanity checks on the output.'''
-        waveform = tf.placeholder(tf.int32)
+        waveform = tf.compat.v1.placeholder(tf.int32)
         np.random.seed(0)
         data = np.random.randint(128)
         proba = self.net.predict_proba_incremental(waveform)
 
         with self.test_session() as sess:
-            sess.run(tf.global_variables_initializer())
+            sess.run(tf.compat.v1.global_variables_initializer())
             sess.run(self.net.init_ops)
             proba = sess.run(proba, feed_dict={waveform: data})
 
@@ -48,13 +48,13 @@ class TestGeneration(tf.test.TestCase):
         self.assertTrue(np.all((proba >= 0) & (proba <= (128 - 1))))
 
     def testCompareSimpleFast(self):
-        waveform = tf.placeholder(tf.int32)
+        waveform = tf.compat.v1.placeholder(tf.int32)
         np.random.seed(0)
         data = np.random.randint(128, size=1000)
         proba = self.net.predict_proba(waveform)
         proba_fast = self.net.predict_proba_incremental(waveform)
         with self.test_session() as sess:
-            sess.run(tf.global_variables_initializer())
+            sess.run(tf.compat.v1.global_variables_initializer())
             sess.run(self.net.init_ops)
             # Prime the incremental generation with all samples
             # except the last one

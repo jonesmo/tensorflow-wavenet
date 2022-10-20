@@ -65,7 +65,7 @@ def trim_silence(audio, threshold, frame_length=2048):
     '''Removes silence at the beginning and end of a sample.'''
     if audio.size < frame_length:
         frame_length = audio.size
-    energy = librosa.feature.rmse(audio, frame_length=frame_length)
+    energy = librosa.feature.rms(audio, frame_length=frame_length)
     frames = np.nonzero(energy > threshold)
     indices = librosa.core.frames_to_samples(frames)[1]
 
@@ -105,15 +105,15 @@ class AudioReader(object):
         self.silence_threshold = silence_threshold
         self.gc_enabled = gc_enabled
         self.threads = []
-        self.sample_placeholder = tf.placeholder(dtype=tf.float32, shape=None)
-        self.queue = tf.PaddingFIFOQueue(queue_size,
+        self.sample_placeholder = tf.compat.v1.placeholder(dtype=tf.float32, shape=None)
+        self.queue = tf.queue.PaddingFIFOQueue(queue_size,
                                          ['float32'],
                                          shapes=[(None, 1)])
         self.enqueue = self.queue.enqueue([self.sample_placeholder])
 
         if self.gc_enabled:
-            self.id_placeholder = tf.placeholder(dtype=tf.int32, shape=())
-            self.gc_queue = tf.PaddingFIFOQueue(queue_size, ['int32'],
+            self.id_placeholder = tf.compat.v1.placeholder(dtype=tf.int32, shape=())
+            self.gc_queue = tf.queue.PaddingFIFOQueue(queue_size, ['int32'],
                                                 shapes=[()])
             self.gc_enqueue = self.gc_queue.enqueue([self.id_placeholder])
 
