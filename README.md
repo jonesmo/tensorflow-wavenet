@@ -158,6 +158,8 @@ to be generated.
 
 ## Running tests
 
+MJ NOTE: These do not work without upgrading some packages I'm unwilling to upgrade
+
 Install the test requirements
 ```
 pip install -r requirements_test.txt
