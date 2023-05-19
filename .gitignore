@@ -1,4 +1,5 @@
-logdir/
+logdir/generate
+logdir/generated_audio
 VCTK-Corpus/
 *.pyc
 data_corpus/
