@@ -54,3 +54,19 @@ in the above commands with
 Sometimes generating longer stretches of sound yields interesting results, and sometimes it doesn't.
 
 If you feel comfortable with this and want to try out other models to get more variety of sounds, dig through logdir/train/accordion and logdir/train/percussion.  The numbered folders in there all contain models at different stages of training, and they all produce sounds that are a bit different.  Most of them will produce noise or garbage some of the time.  Feel free to dig through and try them out!
+
+## Dockerizing the Models
+
+To build the docker image:
+`docker build --tag audiogen .`
+
+To run it and mount it to a persistent volume called "generated_audio":
+`docker run -v /generated_audio:/accordion audiogen`
+
+To download our generated sound to local, we have to mount a dummy container to the volume and pull out the contents.
+
+```bash
+docker run -d --rm --name dummy -v generated_audio:/accordion alpine tail -f /dev/null
+docker cp dummy:/accordion/generated_accordion_sound.wav /Users/mollyejones/Music/TaPIR_lab_2022_23/generated_in_docker
+docker stop dummy
+```
