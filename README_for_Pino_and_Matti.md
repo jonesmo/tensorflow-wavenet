@@ -7,19 +7,23 @@ Hi Pino and Matti!  Here are some instructions for how to generate audio snippet
 If you look in the folder logdir/train/final_models, you'll find an accordion folder and a percussion folder.  Each of these contains two further folders with numeric names (92150 and 345000 for accordion, 280550 and 299999 for percussion).  In turn, each of these contains three files that start with model.ckpt-...  You don't have to worry about the model.ckpt files or open them; they are the program files that implement the models.  The numeric names of the folders are the number of training steps that had completed before that version of the model was saved.  Basically, I trained each model through ~400,000 training steps, and I saved them at various points along the way and tested them out to see what they sounded like.  I'm giving you each two models at different phases of training because they generate slightly different kinds of sounds, and I wanted you to have the chance to play with both.
 
 ## Installing Stuff
-Before you generate any sounds, you have to install a couple programs onto your machine.  To run the installation, go to your Terminal and type
+Before you generate any sounds, you have to get your environment set up and install a couple programs onto your machine.  
+
+`homebrew`
+`python3`
+`pip`
+`pipenv`
+
+Once these have all been successfully installed, navigate to the code repository and type: `pipenv shell`.  This will place you inside a shell that will
+hold all the packages used in the project.
+
+Inside the pipenv shell, run the installation of the other packages:
 
 ```bash
 pip install -r requirements.txt
 ```
 
 and press enter.  Then wait for the installation to complete.
-
-If you get an error message that says something like
-```bash
-pip: command not found
-```
-that means you need to install pip onto your machine before you do the other installation.  I can walk you through this.
 
 ## Generating Sounds
 Once the installation is done, you can start generating sounds.  In your Terminal, you'll type:
