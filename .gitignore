@@ -3,3 +3,4 @@ logdir/generated_audio
 VCTK-Corpus/
 *.pyc
 data_corpus/
+generated_audio/

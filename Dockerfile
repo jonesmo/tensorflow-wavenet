@@ -6,7 +6,6 @@ RUN pip3 install --no-deps numba==0.48
 
 COPY . .
 
-RUN mkdir -p /accordion
-RUN mkdir -p /percussion
+RUN mkdir -p /generated
 
-CMD ["python3", "generate.py", "--samples", "16000", "--wav_out_path", "/accordion/generated_accordion_sound.wav", "logdir/train/final_models/accordion/345000/model.ckpt-345000"]
+ENTRYPOINT ["python3", "generate.py"]
