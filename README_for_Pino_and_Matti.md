@@ -16,17 +16,16 @@ The numeric names of the folders are the number of training steps that completed
 
 I packaged up the models into something called [Docker containers](https://www.docker.com/resources/what-container/).  These will allow you to run the models and generate audio anytime, anywhere, as long as you have Docker installed on your computer.
 
-First, you'll need to install the version of [Docker Desktop](https://www.docker.com/products/docker-desktop/) appropriate for your machine (pay attention to whether you have an Intel or M1 chip if you're on a Mac).  Once you have it installed, make sure Docker is running.
+First, you'll need to install the version of [Docker Desktop](https://www.docker.com/products/docker-desktop/) appropriate for your machine (pay attention to whether you have an Intel or M1/2 chip if you're on a Mac).  Once you have it installed, make sure Docker is running.
 
 Next, open a terminal (on your computer or within VSCode, if you're familiar with that) and navigate to the root of this *tensorflow-wavenet* repository, where this README is located.  If you'd like to learn how to navigate your computer using a terminal, there's a [decent tutorial here](https://terminalcheatsheet.com/guides/navigate-terminal#lets-get-started).
 
-In the terminal, once you're inside the repository, build the docker image:<br>
-`docker build --tag audiogen .`<br>
-Don't forget the . at the end!
-This will take a while.
+In the terminal, once you're inside the repository, pull down the docker image:<br>
+`docker pull mej101/tensorflow-wavenet:latest`
 
 Run the model to generate a one-second clip of audio:
 `docker run --rm -v ./generated_audio:/generated audiogen --samples 16000 --wav_out_path "/generated/generated_accordion_sound.wav" "logdir/train/final_models/accordion/345000/model.ckpt-345000"`
+This will take a while.
 
 This will create a new folder called *generated_audio* on your machine, inside this repository.
 After this step is done running, *generated_audio* should contain an audio file.  Hooray!

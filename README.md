@@ -180,3 +180,17 @@ context stacks or controlling what speech is generated.
 
 - [tex-wavenet](https://github.com/Zeta36/tensorflow-tex-wavenet), a WaveNet for text generation.
 - [image-wavenet](https://github.com/Zeta36/tensorflow-image-wavenet), a WaveNet for image generation.
+
+
+## Molly J Notes
+To build the docker image:<br>
+`docker build --tag audiogen .`<br>
+Don't forget the . at the end!
+
+To push the image to the tensorflow-wavenet DockerHub repository:<br>
+`docker images`
+will locate the image to push.
+`docker tag <IMAGE_ID> mej101/tensorflow-wavenet:<tag_name>`
+will tag the image correctly.
+`docker push mej101/tensorflow-wavenet:<tag_name>`
+will push the image to the repository.
